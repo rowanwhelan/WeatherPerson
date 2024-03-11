@@ -1,0 +1,24 @@
+Day 1:
+    Model: Linear Regression
+    Belvedere: predicted 62 actual 58
+    Midway: predicted 72 actual 72
+    Bergstrom: predicted 85 actual 84
+    Miami: predicted 81 actual 84
+Day 2:
+    Model: Linear Regression
+    Belvedere: predicted 59 actual 49
+    Midway: predicted 72 actual 44
+    Bergstrom: predicted 90 actual 84
+    Miami: predicted 82 actual 82
+Day 3:
+    Model: Linear Regression
+    Belvedere: predicted 55 actual 52
+    Midway: predicted 60 actual 48
+    Bergstrom: predicted 84 actual 83
+    Miami: predicted 82 actual 80
+Day 4:
+    Model: Linear Regression
+    Belvedere: predicted 54 actual 54
+    Midway: predicted 56 actual 49
+    Bergstrom: predicted 81 actual 75
+    Miami: predicted 81 actual 86
