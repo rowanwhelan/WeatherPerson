@@ -2,11 +2,11 @@ import math
 from matplotlib import pyplot as plt
 import numpy as np, datetime, ephem
 
-
+#function to convert from year day to the ephem internal values
 def date_to_ephem_date(year,day):
     return ephem.Date(36525.0 + ((-2000 + year) *365) + day + math.floor((-2000 + year) / 4) -0.5)
 
-def get_sunlight_hours(latitude, longitude, print_val, path):
+def collect_sunlight_hours(latitude, longitude, print_val, path):
     observer = ephem.Observer()
     observer.lat, observer.lon = latitude, longitude
     all_dates = np.array([])
@@ -19,7 +19,7 @@ def get_sunlight_hours(latitude, longitude, print_val, path):
     print('array successfully saved')
 
 def create_sunlight_table(observer, all_dates, all_daylight_hours):
-    for year in range(2000,2023):
+    for year in range(1980,2023):
         dates = np.array([])
         daylight_hours = np.array([])
         days = 366
