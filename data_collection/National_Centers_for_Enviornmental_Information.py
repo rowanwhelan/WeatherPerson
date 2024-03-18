@@ -14,26 +14,26 @@ def index_of_day(date_str):
         day_of_year = date_obj.timetuple().tm_yday
         year = int(date_str[0:4])
         day_of_year = day_of_year + ((-1980 + year)*365 + math.floor((-1980 + year) / 4))
-        print(day_of_year)
         return day_of_year
     except ValueError:
         # Handle invalid date string
         print("Invalid date format. Please provide date in YYYY-MM-DD format.")
 
-def tabulate_response(response,data,datatype):
+def tabulate_response(response,table,datatype):
     if response.status_code == 200:
         data = response.json()
         for observation in data['results']:
             date = observation['date']    
             value = observation['value']
-                
-            data[index_of_day(date),datatype] = value
-        return data
+            table[index_of_day(date)-1][datatype] = value
     else:
         print(f'Error: {response.status_code} - {response.text}')
+    return table
 
 def collect_NCEI_data():
-    data = np.array([[],[],[],[]])
+    table = np.array([[1,0,0,0]])
+    for num in range (1,16070):
+        table = np.vstack((table,[[num+1,0,0,0]]))
     for i in range(1980, 2023):
         start_date = str(i)+'-01-01'
         end_date = str(i)+'-12-31'
@@ -51,7 +51,7 @@ def collect_NCEI_data():
         }
         headers = {'token': key}
         response = requests.get(api_url, params=params, headers=headers)
-        data.append = tabulate_response(response, data, 1)
+        table = tabulate_response(response, table, 1)
         params = {
             'datasetid': data_set,
             'startdate': start_date,
@@ -62,7 +62,7 @@ def collect_NCEI_data():
             'datatypeid': ['ACMH']
         }
         response = requests.get(api_url, params=params, headers=headers)
-        tabulate_response(response, data, 2)
+        table = tabulate_response(response, table, 2)
         params = {
             'datasetid': data_set,
             'startdate': start_date,
@@ -73,6 +73,8 @@ def collect_NCEI_data():
             'datatypeid': ['TMAX']
         }
         response = requests.get(api_url, params=params, headers=headers)
-        tabulate_response(response, data, 2)
-index_of_day('1986-12-04')
-index_of_day('1980-01-04')
+        tabulate_response(response, table, 3)
+    return data
+
+data = collect_NCEI_data()
+print(data)
