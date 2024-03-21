@@ -19,7 +19,7 @@ def collect_sunlight_hours(latitude, longitude, print_val, path):
     print('array successfully saved')
 
 def create_sunlight_table(observer, all_dates, all_daylight_hours):
-    for year in range(1980,2023):
+    for year in range(2000,2023):
         dates = np.array([])
         daylight_hours = np.array([])
         days = 366

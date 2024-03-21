@@ -70,9 +70,3 @@ def collect_NCEI_data(station,data_set,path):
         table = tabulate_response(response, table)
     write_data(table,path)
     return table
-
-path = 'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data'
-#collect_NCEI_data('GHCND:USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
-collect_NCEI_data('GHCND:USW00094846', 'GHCND', path+'/Midway_NCEI.csv')
-#collect_NCEI_data('GHCND:USW00013904', 'GHCND', path+'/Bergstrom_NCEI.csv')
-#collect_NCEI_data('GHCND:USW00012839 ', 'GHCND', path+'/Miami_NCEI.csv')

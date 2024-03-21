@@ -17,7 +17,7 @@ longitude = -87.7522
 #collect_sunlight_hours(latitude, longitude, False, path+'/Midway_Sunlight.csv')
 #collect_air_stats(latitude, longitude, path+'/Midway_Air_pressure.csv')
 #collect_co2_data(latitude,longitude,path+'/Midway_Air_c02.csv')
-#collect_NCEI_data('GHCND:US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00094846', 'GHCND', path+'/Midway_NCEI.csv')
 
 #Bergstrom
 latitude = 30.1953
@@ -25,7 +25,7 @@ longitude = -97.6667
 #collect_sunlight_hours(latitude, longitude, False, path+'/Bergstrom_Sunlight.csv')
 #collect_air_stats(latitude, longitude, path+'/Bergstrom_Air_pressure.csv')
 #collect_co2_data(latitude,longitude,path+'/Bergstrom_Air_c02.csv')
-#collect_NCEI_data('GHCND:USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00013904', 'GHCND', path+'/Bergstrom_NCEI.csv')
 
 #Miami
 latitude = 25.7951
@@ -33,4 +33,4 @@ longitude = -80.2795
 #collect_sunlight_hours(latitude, longitude, False, path+'/Miami_Sunlight.csv')
 #collect_air_stats(latitude, longitude,  path+'/Miami_Air_pressure.csv')
 #collect_co2_data(latitude,longitude,path+'/Miami_Air_c02.csv')
-#collect_NCEI_data('GHCND:USW00092811', 'GHCND', path+'/Miami_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00012839 ', 'GHCND', path+'/Miami_NCEI.csv')

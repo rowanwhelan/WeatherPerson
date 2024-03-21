@@ -1,37 +1,37 @@
 import sys
 import requests
 sys.path.append("../")
-from CS_546.keys.Nasa import key
+import noaapy as noaa
+from CS_546.keys.Nasa import key, passkey
 
-# Define NASA Earthdata credentials
-username = 'rwhelan340'
-password = key
+def collect_nasa_data(dataset_id):
+    # Construct the request URL with your API key
+    url = 'https://cmr.earthdata.nasa.gov/collections.json'
+    params = {
+        'short_name': dataset_id,
+        'bounding_box': '-180,-90,180,90',  # Global coverage
+        'temporal': '2023   -01-01T00:00:00Z,2023-12-31T23:59:59Z',  # Temporal range
+        'page_size': 10  # Number of results per page
+    }
 
-# Define search parameters
-keyword = 'sea surface temperature'
-bounding_box = '-80,0,0,80'  # Atlantic Ocean
-start_date = '2000-01-01'
-end_date = '2000-01-31'
+    # Make the request
+    response = requests.get(url,params=params)
 
-# Construct search URL
-url = f'https://cmr.earthdata.nasa.gov/search/granules.json?short_name=SST&version=1&temporal[]={start_date},{end_date}&bounding_box={bounding_box}&keyword={keyword}'
-
-# Perform authenticated request to NASA Earthdata
-response = requests.get(url, auth=(username, password))
-
-# Check if request was successful
-if response.status_code == 200:
-    # Extract URLs of data granules
-    granules = response.json()['feed']['entry']
-    for granule in granules:
-        granule_url = granule['links'][0]['href']
-        print(f"Downloading: {granule_url}")
-        
-        # Download data
-        data_response = requests.get(granule_url, auth=(username, password))
-        
-        # Save data to file
-        with open(granule_url.split('/')[-1], 'wb') as f:
-            f.write(data_response.content)
-else:
-    print("Error:", response.status_code)
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Process the response data
+        try:
+            data = response.json()
+            granules = data.get('feed', {}).get('entry', [])
+            print("Dataset ID:", dataset_id)
+            print("Number of granules found:", len(granules))
+        except KeyError as e:
+                print(f"Error: Unable to extract dataset IDs. KeyError: {e}")
+                print("Response Content:")
+                print(response.content)
+                return []
+    else:
+        # Handle the error
+        print(f'Error: {response.status_code} - {response.text}')
+dataset_id = 'C1588876556-EUMETSAT'
+collect_nasa_data(dataset_id)

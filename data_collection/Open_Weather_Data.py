@@ -56,8 +56,3 @@ def collect_co2_data(latitude, longitude, path):
     print(len(complete_co2_table))
     #write_data(complete_co2_table, path)
     return
-
-path = 'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data'
-latitude = 29.7604
-longitude = -95.3698
-collect_co2_data(latitude,longitude,path+'/Bergstrom_Air_c02.csv')

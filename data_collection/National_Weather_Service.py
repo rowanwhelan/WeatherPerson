@@ -20,4 +20,3 @@ def collect_NWS_data():
         print('Error:', response.status_code)
         print('Response Content:', response.text)  # Print response content for inspection
 
-collect_NWS_data()
