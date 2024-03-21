@@ -5,6 +5,17 @@ import requests,sys
 sys.path.append("../")
 from CS_546.keys.NCEI import key
 
+def write_data(data, path):
+    if len(data) == 0:
+        print("Error")
+        return
+    try:
+        # Save the data to the CSV file
+        np.savetxt(path, data, delimiter=",")
+        print(f"Data has been successfully written to '{path}'.")
+    except Exception as e:
+        print("An error occurred while writing to the CSV file:", e)
+
 def index_of_day(date_str):
     date_str = date_str[0:10]
     try:
@@ -30,21 +41,19 @@ def tabulate_response(response,table,datatype):
         print(f'Error: {response.status_code} - {response.text}')
     return table
 
-def collect_NCEI_data():
+def collect_NCEI_data(station,data_set,path):
     table = np.array([[1,0,0,0]])
     for num in range (1,16070):
         table = np.vstack((table,[[num+1,0,0,0]]))
     for i in range(1980, 2023):
         start_date = str(i)+'-01-01'
         end_date = str(i)+'-12-31'
-        data_set = 'GHCND'
-
         api_url = 'https://www.ncdc.noaa.gov/cdo-web/api/v2/data'
         params = {
             'datasetid': data_set,
             'startdate': start_date,
             'enddate': end_date,
-            'stationid': 'GHCND:USW00014732',
+            'stationid': station,
             'format': 'csv',
             'limit': '366',
             'datatypeid': ['ACMH']
@@ -56,7 +65,7 @@ def collect_NCEI_data():
             'datasetid': data_set,
             'startdate': start_date,
             'enddate': end_date,
-            'stationid': 'GHCND:USW00014732',
+            'stationid': station,
             'format': 'csv',
             'limit': '366',
             'datatypeid': ['ACMH']
@@ -67,14 +76,14 @@ def collect_NCEI_data():
             'datasetid': data_set,
             'startdate': start_date,
             'enddate': end_date,
-            'stationid': 'GHCND:USW00014732',
+            'stationid': station,
             'format': 'csv',
             'limit': '366',
             'datatypeid': ['TMAX']
         }
         response = requests.get(api_url, params=params, headers=headers)
-        tabulate_response(response, table, 3)
-    return data
+        table = tabulate_response(response, table, 3)
+    write_data(table,path)
+    return table
 
-data = collect_NCEI_data()
-print(data)
+
