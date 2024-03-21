@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import time
 import numpy as np
 import requests,sys 
 sys.path.append("../")
@@ -30,22 +31,27 @@ def index_of_day(date_str):
         # Handle invalid date string
         print("Invalid date format. Please provide date in YYYY-MM-DD format.")
 
-def tabulate_response(response,table,datatype):
+def tabulate_response(response,table):
     if response.status_code == 200:
         data = response.json()
+        print(data)
+        if data == {}:
+            return table
         for observation in data['results']:
             date = observation['date']    
             value = observation['value']
-            table[index_of_day(date)-1][datatype] = value
+            table[index_of_day(date)-1][1] = value
     else:
         print(f'Error: {response.status_code} - {response.text}')
     return table
 
 def collect_NCEI_data(station,data_set,path):
-    table = np.array([[1,0,0,0]])
+    retry_delay = 1
+    table = np.array([[1,0]])
     for num in range (1,16070):
-        table = np.vstack((table,[[num+1,0,0,0]]))
+        table = np.vstack((table,[[num+1,0]]))
     for i in range(1980, 2023):
+        time.sleep(retry_delay)
         start_date = str(i)+'-01-01'
         end_date = str(i)+'-12-31'
         api_url = 'https://www.ncdc.noaa.gov/cdo-web/api/v2/data'
@@ -54,40 +60,18 @@ def collect_NCEI_data(station,data_set,path):
             'startdate': start_date,
             'enddate': end_date,
             'stationid': station,
-            'format': 'csv',
-            'limit': '366',
-            'datatypeid': ['ACMH']
+            'format': 'json',
+            'limit': '1000',
+            'datatypeid': ['ACMC']
         }
         headers = {'token': key}
         response = requests.get(api_url, params=params, headers=headers)
-        table = tabulate_response(response, table, 1)
-        params = {
-            'datasetid': data_set,
-            'startdate': start_date,
-            'enddate': end_date,
-            'stationid': station,
-            'format': 'csv',
-            'limit': '366',
-            'datatypeid': ['ACMH']
-        }
-        response = requests.get(api_url, params=params, headers=headers)
-        table = tabulate_response(response, table, 2)
-        params = {
-            'datasetid': data_set,
-            'startdate': start_date,
-            'enddate': end_date,
-            'stationid': station,
-            'format': 'csv',
-            'limit': '366',
-            'datatypeid': ['TMAX']
-        }
-        response = requests.get(api_url, params=params, headers=headers)
-        table = tabulate_response(response, table, 3)
+        table = tabulate_response(response, table)
     write_data(table,path)
     return table
 
 path = 'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data'
 collect_NCEI_data('GHCND:USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
-collect_NCEI_data('GHCND:US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
-collect_NCEI_data('GHCND:USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
-collect_NCEI_data('GHCND:USW00092811', 'GHCND', path+'/Miami_NCEI.csv')
+#collect_NCEI_data('GHCND:US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00092811', 'GHCND', path+'/Miami_NCEI.csv')

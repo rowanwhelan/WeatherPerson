@@ -52,7 +52,7 @@ def write_data(data, path):
 def collect_co2_data(latitude, longitude, path):
     complete_co2_table = np.array([])
     start = 1606223802-2087
-    for i in range(0,8):
+    for i in range(0,365):
         leap_year =0
         if i%4 == 0: 
             leap_year = 1
