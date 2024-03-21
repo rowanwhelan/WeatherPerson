@@ -86,4 +86,8 @@ def collect_NCEI_data(station,data_set,path):
     write_data(table,path)
     return table
 
-
+path = 'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data'
+collect_NCEI_data('GHCND:USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
+collect_NCEI_data('GHCND:US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
+collect_NCEI_data('GHCND:USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
+collect_NCEI_data('GHCND:USW00092811', 'GHCND', path+'/Miami_NCEI.csv')
