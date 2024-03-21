@@ -50,7 +50,7 @@ def collect_NCEI_data(station,data_set,path):
     table = np.array([[1,0]])
     for num in range (1,16070):
         table = np.vstack((table,[[num+1,0]]))
-    for i in range(1980, 2023):
+    for i in range(2000, 2023):
         time.sleep(retry_delay)
         start_date = str(i)+'-01-01'
         end_date = str(i)+'-12-31'
@@ -62,7 +62,7 @@ def collect_NCEI_data(station,data_set,path):
             'stationid': station,
             'format': 'json',
             'limit': '1000',
-            'datatypeid': ['ACMC']
+            'datatypeid': ['PRCP']
         }
         headers = {'token': key}
         response = requests.get(api_url, params=params, headers=headers)
@@ -71,7 +71,7 @@ def collect_NCEI_data(station,data_set,path):
     return table
 
 path = 'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data'
-collect_NCEI_data('GHCND:USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
-#collect_NCEI_data('GHCND:US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
-#collect_NCEI_data('GHCND:USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
+#collect_NCEI_data('USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
+#collect_NCEI_data('US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
+collect_NCEI_data('USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
 #collect_NCEI_data('GHCND:USW00092811', 'GHCND', path+'/Miami_NCEI.csv')
