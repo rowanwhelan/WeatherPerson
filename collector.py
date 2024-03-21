@@ -10,6 +10,7 @@ longitude = -73.9691
 #collect_air_stats(latitude, longitude, path+'/Belvedere_Air_pressure.csv')
 #collect_co2_data(latitude,longitude,path+'/Belvedere_Air_c02.csv')
 #collect_NCEI_data('GHCND:USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
+
 #Midway
 latitude = 41.7868
 longitude = -87.7522
@@ -17,6 +18,7 @@ longitude = -87.7522
 #collect_air_stats(latitude, longitude, path+'/Midway_Air_pressure.csv')
 #collect_co2_data(latitude,longitude,path+'/Midway_Air_c02.csv')
 #collect_NCEI_data('GHCND:US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
+
 #Bergstrom
 latitude = 30.1953
 longitude = -97.6667
@@ -24,6 +26,7 @@ longitude = -97.6667
 #collect_air_stats(latitude, longitude, path+'/Bergstrom_Air_pressure.csv')
 #collect_co2_data(latitude,longitude,path+'/Bergstrom_Air_c02.csv')
 #collect_NCEI_data('GHCND:USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
+
 #Miami
 latitude = 25.7951
 longitude = -80.2795

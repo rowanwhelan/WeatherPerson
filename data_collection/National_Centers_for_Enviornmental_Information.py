@@ -25,7 +25,7 @@ def index_of_day(date_str):
         # Get the day of the year
         day_of_year = date_obj.timetuple().tm_yday
         year = int(date_str[0:4])
-        day_of_year = day_of_year + ((-1980 + year)*365 + math.floor((-1980 + year) / 4))
+        day_of_year = day_of_year + ((-2000 + year)*365 + math.floor((-2000 + year) / 4))
         return day_of_year
     except ValueError:
         # Handle invalid date string
@@ -34,12 +34,12 @@ def index_of_day(date_str):
 def tabulate_response(response,table):
     if response.status_code == 200:
         data = response.json()
-        print(data)
         if data == {}:
             return table
         for observation in data['results']:
             date = observation['date']    
             value = observation['value']
+            print(value, index_of_day(date)-1)
             table[index_of_day(date)-1][1] = value
     else:
         print(f'Error: {response.status_code} - {response.text}')
@@ -48,8 +48,9 @@ def tabulate_response(response,table):
 def collect_NCEI_data(station,data_set,path):
     retry_delay = 1
     table = np.array([[1,0]])
-    for num in range (1,16070):
+    for num in range (1,8765):
         table = np.vstack((table,[[num+1,0]]))
+        
     for i in range(2000, 2023):
         time.sleep(retry_delay)
         start_date = str(i)+'-01-01'
@@ -71,7 +72,7 @@ def collect_NCEI_data(station,data_set,path):
     return table
 
 path = 'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data'
-#collect_NCEI_data('USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
-#collect_NCEI_data('US1ILCK0012', 'GHCND', path+'/Midway_NCEI.csv')
-collect_NCEI_data('USW00093987', 'GHCND', path+'/Bergstrom_NCEI.csv')
-#collect_NCEI_data('GHCND:USW00092811', 'GHCND', path+'/Miami_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00014732', 'GHCND', path+'/Belvedere_NCEI.csv')
+collect_NCEI_data('GHCND:USW00094846', 'GHCND', path+'/Midway_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00013904', 'GHCND', path+'/Bergstrom_NCEI.csv')
+#collect_NCEI_data('GHCND:USW00012839 ', 'GHCND', path+'/Miami_NCEI.csv')

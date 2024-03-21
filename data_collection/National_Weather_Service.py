@@ -1,7 +1,7 @@
 import requests,sys 
 sys.path.append("../")
 
-def collect_NCEI_data():
+def collect_NWS_data():
     #Belvedere
     stationid = 'KW035'
     start = '1980-01-01T00:00:00+19:00'
@@ -20,4 +20,4 @@ def collect_NCEI_data():
         print('Error:', response.status_code)
         print('Response Content:', response.text)  # Print response content for inspection
 
-collect_NCEI_data()
+collect_NWS_data()
