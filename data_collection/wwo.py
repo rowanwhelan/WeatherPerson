@@ -61,7 +61,7 @@ def compile_wwo_table(location):
     else:
         print("Failed to fetch weather data.")
         
-compile_wwo_table("New York City, New York,US")
-compile_wwo_table("Chicago, Illinois,US")
-compile_wwo_table("Miami, Florida, US")
-compile_wwo_table("Austin, Texas, US")
+#compile_wwo_table("New York City, New York,US")
+#compile_wwo_table("Chicago, Illinois,US")
+#compile_wwo_table("Miami, Florida, US")
+#compile_wwo_table("Austin, Texas, US")
