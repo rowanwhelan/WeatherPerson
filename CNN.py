@@ -21,6 +21,21 @@ class ClimateNN(nn.Module):
             x = self.fc4(x)
             return x
 
+class BergClimateNN(nn.Module):
+        def __init__(self):
+            super(BergClimateNN, self).__init__()
+            self.fc1 = nn.Linear(10, 128)  # Input layer
+            self.fc2 = nn.Linear(128,64)
+            self.fc3 = nn.Linear(64, 32)   # Hidden layer
+            self.fc4 = nn.Linear(32, 1)    # Output layer
+
+        def forward(self, x):
+            x = torch.relu(self.fc1(x))
+            x = torch.relu(self.fc2(x))
+            x = torch.relu(self.fc3(x))
+            x = self.fc4(x)
+            return x
+    
 def read_data(file_name):
     try:
         with open(file_name, 'r', newline='') as file:
@@ -133,7 +148,37 @@ def NN(data,labels):
             print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
     print('Finished Training')
     return model
-    
+
+def Berg_NN(data,labels):
+    # Convert numpy arrays to PyTorch tensors
+    X = torch.tensor(data, dtype=torch.float32)
+    y = torch.tensor(labels, dtype=torch.float32)
+
+
+    # Initialize the model, loss function, and optimizer
+    model = BergClimateNN()
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.0005)
+
+    # Training the model
+    epochs = 500
+    batch_size = 32
+    for epoch in range(epochs):
+        for i in range(0, len(X), batch_size):
+            inputs = X[i:i+batch_size]
+            batch_labels = y[i:i+batch_size].view(-1,1)
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, batch_labels)
+            loss.backward()
+            optimizer.step()
+
+        if epoch % 100 == 0:
+            print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
+    print('Finished Training')
+    return model
+
 def test_model(model, test_data, test_labels, threshold=0.4):
     # Convert test data to PyTorch tensor
     X_test = torch.tensor(test_data, dtype=torch.float32)
@@ -180,7 +225,17 @@ def complete_NN(name, prev):
         model = NN(data.astype(float), data_labels.astype(float))
         accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
     return model
-            
+
+def complete_Berg_NN(name, prev):
+    print(f'Training a model for {name}')
+    data = compile_tables(name, prev)
+    testing_labels, testing_data, data_labels, data = format_data(data)
+    accuracy = 0
+    while accuracy < 80:
+        model = Berg_NN(data.astype(float), data_labels.astype(float))
+        accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
+    return model
+
 def save_model(model,name):
     torch.save(model.state_dict(), f'models/{name}_model')
     
@@ -202,13 +257,13 @@ def model_instantiation():
     #Midway
     prev_temp = [48,41,41]
     name = 'Midway'
-    mid_model = complete_NN(name,prev_temp)
-    save_model(mid_model,name)
+    #mid_model = complete_NN(name,prev_temp)
+    #save_model(mid_model,name)
     #Bergstrom
     prev_temp = (79,81,72)
     name = 'Bergstrom'
-    #ber_model = complete_NN(name,prev_temp)
-    #save_model(ber_model,name)
+    ber_model = complete_Berg_NN(name,prev_temp)
+    save_model(ber_model,name)
 
 def main():
     model_instantiation()
