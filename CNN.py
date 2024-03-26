@@ -1,5 +1,4 @@
 import csv
-import os
 import numpy as np
 import torch
 import torch.nn as nn
@@ -173,54 +172,43 @@ def format_data(data):
     return testing_labels, testing_data, labels, data
 
 def complete_NN(name, prev):
+    print(f'Training a model for {name}')
     data = compile_tables(name, prev)
     testing_labels, testing_data, data_labels, data = format_data(data)
     accuracy = 0
-    while accuracy < 90:
+    while accuracy < 80:
         model = NN(data.astype(float), data_labels.astype(float))
         accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
     return model
             
 def save_model(model,name):
-    if not os.path.exists("models"):
-        os.makedirs("models")
-    model_json = model.to_json()
-    with open(f"models/{name}_model.json", "w") as json_file:
-        json_file.write(model_json)
-
-    # Serialize weights to HDF5
-    model.save_weights("models/model_weights.h5")
+    torch.save(model.state_dict(), f'models/{name}_model')
     
-def load_model(model):
-    # Load model architecture from JSON
-    with open('models/model.json', 'r') as json_file:
-        loaded_model_json = json_file.read()
-    loaded_model = model_from_json(loaded_model_json)
-
-    # Load weights into new model
-    loaded_model.load_weights("models/model_weights.h5")
+def load_model(model,name):
+    model = ClimateNN()
+    model.load_state_dict(torch.load(f'models/{name}_model'))
 
 def model_instantiation():
     #Belvedere
     prev_temp = [36,50,43]
     name = 'Belvedere'
-    bel_model = complete_NN(name, prev_temp)
-    save_model(bel_model,name)  
+    #bel_model = complete_NN(name, prev_temp)
+    #save_model(bel_model,name)  
     #Miami
     prev_temp = [71,75,79]
     name = 'Miami'
-    mia_model = complete_NN(name,prev_temp)
-    save_model(mia_model)
-    #Bergstrom
-    prev_temp = (79,81,72)
-    name = 'Bergstrom'
-    ber_model = complete_NN(name,prev_temp)
-    save_model(ber_model)
+    #mia_model = complete_NN(name,prev_temp)
+    #save_model(mia_model,name)
     #Midway
     prev_temp = [48,41,41]
     name = 'Midway'
     mid_model = complete_NN(name,prev_temp)
-    save_model(mid_model)
+    save_model(mid_model,name)
+    #Bergstrom
+    prev_temp = (79,81,72)
+    name = 'Bergstrom'
+    #ber_model = complete_NN(name,prev_temp)
+    #save_model(ber_model,name)
 
 def main():
     model_instantiation()
