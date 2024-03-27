@@ -1,10 +1,19 @@
 import csv
+from datetime import datetime, timedelta
 import numpy as np
+import requests
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from keras.models import model_from_json
+from meteostat import Point, Daily
+from keys.OpenWeather import key
+
+def celsius_to_fahrenheit(celsius):
+    return (celsius * 9/5) + 32
+def kelvin_to_fahrenheit(kelvin):
+    return (kelvin - 273.15) * 9/5 + 32
 
 class ClimateNN(nn.Module):
         def __init__(self):
@@ -247,25 +256,82 @@ def model_instantiation():
     #Belvedere
     prev_temp = [36,50,43]
     name = 'Belvedere'
-    #bel_model = complete_NN(name, prev_temp)
-    #save_model(bel_model,name)  
+    bel_model = complete_NN(name, prev_temp)
+    save_model(bel_model,name)  
     #Miami
     prev_temp = [71,75,79]
     name = 'Miami'
-    #mia_model = complete_NN(name,prev_temp)
-    #save_model(mia_model,name)
+    mia_model = complete_NN(name,prev_temp)
+    save_model(mia_model,name)
     #Midway
     prev_temp = [48,41,41]
     name = 'Midway'
-    #mid_model = complete_NN(name,prev_temp)
-    #save_model(mid_model,name)
+    mid_model = complete_NN(name,prev_temp)
+    save_model(mid_model,name)
     #Bergstrom
     prev_temp = (79,81,72)
     name = 'Bergstrom'
     ber_model = complete_Berg_NN(name,prev_temp)
     save_model(ber_model,name)
 
+
+def get_forecast(latitude, longitude):
+    today = datetime.now()
+    # Create a Point object with the coordinates
+    location = Point(latitude, longitude)
+
+    # Fetch forecast data from OpenWeatherMap API
+    api_key = key
+    response = requests.get(f'http://pro.openweathermap.org/data/2.5/weather?q=New York City, New York&APPID={key}')
+    openweather_data = response.json()
+    print(openweather_data)
+
+    # Get average CO2 and change in CO2 (if available)
+    average_co2 = None
+    change_in_co2 = None
+
+    # Fetch historical CO2 data from Meteostat for the previous day
+    yesterday = today
+    meteo_data = Daily(location, yesterday)
+    meteo_data = meteo_data.normalize()
+    meteo_data = meteo_data.fetch()
+    print(meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')])
+    
+    #PRCP
+    precipitation_rain = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['prcp'].fillna(0).values[0]
+    precipitation_snow = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['snow'].fillna(0).values[0]
+    precipitation = precipitation_snow + precipitation_rain
+    
+    #Wdir
+    wind_direction_degrees = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['wdir'].fillna(0).values[0]
+    
+    #WPGT
+    wind_speed = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['wspd'].fillna(0).values[0]
+    
+    #Pres
+    pressure = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['pres'].fillna(0).values[0]
+    
+    sunlight_duration_hours = None
+
+    # Print forecast data
+    print("Forecast for today:")
+    print(f"Precipitation: {precipitation} mm")
+    print(f"Wind Direction: {wind_direction_degrees}")
+    print(f"Wind Peak Gust: {wind_speed} m/s")
+    print(f"Pressure: {pressure}")
+    print(f"Sunlight Duration: {sunlight_duration_hours} hours")
+    print(f"Average CO2: {average_co2} ppm")
+    print("Change in CO2: N/A (not available)")
+    #Previous Temps, prcp, wdir, wpgt, pres, prcp, sunlight, humidity, co2 average, co2 slope
+    #return np.array([precipitation, wind_direction_degrees, wind_speed, precipitation, , ])
+
+def generate_prediction( latitude, longitude, model):
+    get_forecast(latitude, longitude)
+    pass
+
 def main():
-    model_instantiation()
+    latitude = 40.7794
+    longitude = -73.9691
+    generate_prediction(latitude, longitude, None)
     
 main()
