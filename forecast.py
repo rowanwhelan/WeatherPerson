@@ -13,6 +13,10 @@ import pandas as pd
 import sys
 sys.path.append("../")
 from CS_546.data_collection.Open_Weather_Data import get_co_in_air
+from CS_546.CNN import load_model
+
+def celsius_to_fahrenheit(celsius):
+    return (celsius * 9/5) + 32
 
 def datetime_to_hours_float(dt):
     if isinstance(dt, timedelta):
@@ -53,7 +57,7 @@ def get_forecast(latitude, longitude, name):
     day_before_day_before_yesterday = day_before_yesterday - pd.Timedelta(days=1)
     max_temp_day_before_day_before = Daily(location, day_before_day_before_yesterday).normalize().fetch()[meteo_data.index == day_before_day_before_yesterday.strftime('%Y-%m-%d')]['tmax'].values[0]
     
-    prev_temp = [max_temp_yesterday, max_temp_day_before, max_temp_day_before_day_before]
+    prev_temp = [celsius_to_fahrenheit(max_temp_yesterday), celsius_to_fahrenheit(max_temp_day_before), celsius_to_fahrenheit(max_temp_day_before_day_before)]
         
     #PRCP
     precipitation_rain = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['prcp'].fillna(0).values[0]
@@ -102,37 +106,43 @@ def get_forecast(latitude, longitude, name):
     print(f"Average CO2: {co2_average} ppm")
     print(f"Change in CO2: {co2_change}")
     #Previous Temps, prcp, wdir, wpgt, pres, prcp, sunlight, humidity, co2 average, co2 slope
-    # check        , check, check, check, check, check, check, check, 
     if name != 'Bergstrom':
-        return np.array([prev_temp[0], prev_temp[1], prev_temp[2], precipitation, wind_direction_degrees, wind_speed, precipitation,co2_average, co2_change ])
+        return np.array([prev_temp[0], prev_temp[1], prev_temp[2], precipitation, wind_direction_degrees, wind_speed, pressure, precipitation, sunlight_duration_hours, humidity, co2_average, co2_change ])
     else:
-        return np.array([prev_temp[0], prev_temp[1], prev_temp[2], precipitation, wind_direction_degrees, wind_speed, precipitation])
+        return np.array([prev_temp[0], prev_temp[1], prev_temp[2], precipitation, wind_direction_degrees, wind_speed, pressure, precipitation, sunlight_duration_hours, humidity])
 
 def generate_prediction( latitude, longitude, name, model):
-    forecast = get_forecast(latitude, longitude)
+    forecast = get_forecast(latitude, longitude,name)
     return model.predict(forecast)
 
 def daily_protocol():
     #Belvedere
     latitude = 40.7794
     longitude = -73.9691
-    forecast = get_forecast(latitude,longitude, 'Belvedere')
+    name = 'Belvedere'
+    prediction = generate_prediction(latitude, longitude, name, load_model(name))
+    print(prediction)
 
     #Midway
     latitude = 41.7868
     longitude = -87.7522
-    forecast = get_forecast(latitude,longitude, 'Midway')
+    name = 'Midway'
+    prediction = generate_prediction(latitude,longitude, name, load_model(name) )
+    print(prediction)
 
     #Bergstrom
     latitude = 30.1953
     longitude = -97.6667
-    forecast = get_forecast(latitude,longitude, 'Bergstrom')
+    name = 'Bergstrom'
+    prediction = generate_prediction(latitude,longitude, name, load_model(name) )
+    print(prediction)
 
     #Miami
     latitude = 25.7951
     longitude = -80.2795
-    forecast = get_forecast(latitude,longitude, 'Miami')
-
+    name = 'Miami'
+    prediction = generate_prediction(latitude,longitude, name, load_model(name) )
+    print(prediction)
 
     
 def main():

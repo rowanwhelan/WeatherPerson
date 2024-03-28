@@ -11,10 +11,13 @@ from meteostat import Point, Daily
 from keys.OpenWeather import key
 import pandas as pd
 
-prev_mid = [48,41,41]
-prev_ber = [79,81,72]
-prev_mia = [71,75,79]
-prev_bel = [36,50,43]
+def fahrenheit_to_celsius(fahrenheit):
+    celsius = (fahrenheit - 32) * 5 / 9
+    return celsius
+prev_mid = [fahrenheit_to_celsius(vals) for vals in [48,41,41]]
+prev_ber = [fahrenheit_to_celsius(vals) for vals in [79,81,72]]
+prev_mia = [fahrenheit_to_celsius(vals) for vals in [71,75,79]]
+prev_bel = [fahrenheit_to_celsius(vals) for vals in [36,50,43]]
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
 def kelvin_to_fahrenheit(kelvin):
@@ -34,6 +37,15 @@ class ClimateNN(nn.Module):
             x = torch.relu(self.fc3(x))
             x = self.fc4(x)
             return x
+        
+        def predict(self, input_data):
+            input_tensor = torch.tensor(input_data, dtype=torch.float32)
+            with torch.no_grad():
+                self.eval()  # Set model to evaluation mode
+                output_tensor = self(input_tensor)
+                # If you have a single output neuron (e.g., regression), you might do:
+                predicted_output = output_tensor.item()
+                return predicted_output
 
 class BergClimateNN(nn.Module):
         def __init__(self):
@@ -49,6 +61,15 @@ class BergClimateNN(nn.Module):
             x = torch.relu(self.fc3(x))
             x = self.fc4(x)
             return x
+        
+        def predict(self, input_data):
+            input_tensor = torch.tensor(input_data, dtype=torch.float32)
+            with torch.no_grad():
+                self.eval()  # Set model to evaluation mode
+                output_tensor = self(input_tensor)
+                # If you have a single output neuron (e.g., regression), you might do:
+                predicted_output = output_tensor.item()
+                return predicted_output
     
 def read_data(file_name):
     try:
@@ -118,10 +139,10 @@ def compile_tables(name,prev_temp):
         co2_table = read_data(filename)
         co2_table = co2_table[-26295:]
         co2_table = co2_reshape(co2_table)
-        combined_array = np.column_stack((meteo_array[:, 1], hist_temp[:,0], hist_temp[:,1], hist_temp[:,2], meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array, co2_table[:, 0], co2_table[:, 1]))
+        combined_array = np.column_stack((celsius_to_fahrenheit(meteo_array[:, 0]), celsius_to_fahrenheit(hist_temp[:,0]), celsius_to_fahrenheit(hist_temp[:,1]), celsius_to_fahrenheit(hist_temp[:,2]), meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array, co2_table[:, 0], co2_table[:, 1]))
         return combined_array
     else:
-        combined_array = np.column_stack((meteo_array[:, 1], hist_temp[:,0], hist_temp[:,1], hist_temp[:,2], meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array))
+        combined_array = np.column_stack((celsius_to_fahrenheit(meteo_array[:, 0]), celsius_to_fahrenheit(hist_temp[:,0]), celsius_to_fahrenheit(hist_temp[:,1]), celsius_to_fahrenheit(hist_temp[:,2]), meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array))
         return combined_array
 
 # pass in a n x 1 np array and three manually inputted temperatures get back a n x 3 np array
@@ -148,7 +169,7 @@ def NN(data,labels):
     optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
     # Training the model
-    epochs = 500
+    epochs = 1000
     batch_size = 32
     for epoch in range(epochs):
         for i in range(0, len(X), batch_size):
@@ -178,7 +199,7 @@ def Berg_NN(data,labels):
     optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
     # Training the model
-    epochs = 500
+    epochs = 1000
     batch_size = 32
     for epoch in range(epochs):
         for i in range(0, len(X), batch_size):
@@ -257,7 +278,10 @@ def save_model(model,name):
     torch.save(model.state_dict(), f'models/{name}_model')
     
 def load_model(name):
-    model = ClimateNN()
+    if name != 'Bergstrom':
+        model = ClimateNN()
+    else:
+        model = BergClimateNN()
     model.load_state_dict(torch.load(f'models/{name}_model'))
     return model
 
@@ -292,3 +316,4 @@ def complete_protocol():
 def main():
     complete_protocol()
     
+main()
