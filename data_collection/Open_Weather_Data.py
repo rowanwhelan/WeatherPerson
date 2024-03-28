@@ -19,7 +19,6 @@ def get_co_in_air(latitude, longitude, start_date, end_date):
     for _ in range(retry_count):
         try:
             list_of_historical_values = mgr.air_quality_history_at_coords(latitude, longitude, start=start_date, end=end_date)
-            print(list_of_historical_values)
             # Each item in the list_of_historical_values is an Air  Status object 
             for air_status in list_of_historical_values:
                 co2_vals = np.append(co2_vals,air_status.co)

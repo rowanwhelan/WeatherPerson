@@ -15,11 +15,11 @@ def collect_sunlight_hours(latitude, longitude, print_val, path):
     if print_val:
         plot_sunlight_table(all_dates, all_daylight_hours)
     zipped_array = np.vstack((all_dates, all_daylight_hours)).ravel(order='F')
-    np.savetxt(path, zipped_array, delimiter=',')
+    np.savetxt(path, all_daylight_hours, delimiter=',')
     print('array successfully saved')
 
 def create_sunlight_table(observer, all_dates, all_daylight_hours):
-    for year in range(2000,2023):
+    for year in range(2000,2024):
         dates = np.array([])
         daylight_hours = np.array([])
         days = 366

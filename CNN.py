@@ -9,7 +9,12 @@ import numpy as np
 from keras.models import model_from_json
 from meteostat import Point, Daily
 from keys.OpenWeather import key
+import pandas as pd
 
+prev_mid = [48,41,41]
+prev_ber = [79,81,72]
+prev_mia = [71,75,79]
+prev_bel = [36,50,43]
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9/5) + 32
 def kelvin_to_fahrenheit(kelvin):
@@ -92,9 +97,12 @@ def compile_tables(name,prev_temp):
     filename = f'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data/{name}_NCEI.csv'
     ncei_array = read_data(filename)
     filename = f'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data/{name}_Sunlight.csv'
-    sun_array = read_data(filename)
+    sun_array = np.genfromtxt(filename, delimiter=',')
     # sun array data is taken farther back, but I have decided to only use the last 23 years of data to match the other sources
-    sun_array = sun_array[-8765:]
+    original_shape = (2, len(sun_array) // 2)
+    unzipped_array = sun_array.reshape(original_shape, order='F')
+    sun_array = unzipped_array[1]
+    padded_sun_array = np.pad(sun_array, (8765-8401, 0), 'constant', constant_values=0)
     filename = f'C:/Users/rwhel/OneDrive/Desktop/Notes/College/CS_546/data/{name}_humidity.csv'
     #humidity data only goes back to 2009 so you need to add 
     humid_array = read_data(filename)
@@ -110,10 +118,10 @@ def compile_tables(name,prev_temp):
         co2_table = read_data(filename)
         co2_table = co2_table[-26295:]
         co2_table = co2_reshape(co2_table)
-        combined_array = np.column_stack((meteo_array[:, 1], hist_temp[:,0], hist_temp[:,1], hist_temp[:,2], meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], sun_array[:, 0], padded_humid_array, co2_table[:, 0], co2_table[:, 1]))
+        combined_array = np.column_stack((meteo_array[:, 1], hist_temp[:,0], hist_temp[:,1], hist_temp[:,2], meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array, co2_table[:, 0], co2_table[:, 1]))
         return combined_array
     else:
-        combined_array = np.column_stack((meteo_array[:, 1], hist_temp[:,0], hist_temp[:,1], hist_temp[:,2], meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], sun_array[:, 0], padded_humid_array))
+        combined_array = np.column_stack((meteo_array[:, 1], hist_temp[:,0], hist_temp[:,1], hist_temp[:,2], meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array))
         return combined_array
 
 # pass in a n x 1 np array and three manually inputted temperatures get back a n x 3 np array
@@ -248,9 +256,10 @@ def complete_Berg_NN(name, prev):
 def save_model(model,name):
     torch.save(model.state_dict(), f'models/{name}_model')
     
-def load_model(model,name):
+def load_model(name):
     model = ClimateNN()
     model.load_state_dict(torch.load(f'models/{name}_model'))
+    return model
 
 def model_instantiation():
     #Belvedere
@@ -274,64 +283,12 @@ def model_instantiation():
     ber_model = complete_Berg_NN(name,prev_temp)
     save_model(ber_model,name)
 
-
-def get_forecast(latitude, longitude):
-    today = datetime.now()
-    # Create a Point object with the coordinates
-    location = Point(latitude, longitude)
-
-    # Fetch forecast data from OpenWeatherMap API
-    api_key = key
-    response = requests.get(f'http://pro.openweathermap.org/data/2.5/weather?q=New York City, New York&APPID={key}')
-    openweather_data = response.json()
-    print(openweather_data)
-
-    # Get average CO2 and change in CO2 (if available)
-    average_co2 = None
-    change_in_co2 = None
-
-    # Fetch historical CO2 data from Meteostat for the previous day
-    yesterday = today
-    meteo_data = Daily(location, yesterday)
-    meteo_data = meteo_data.normalize()
-    meteo_data = meteo_data.fetch()
-    print(meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')])
-    
-    #PRCP
-    precipitation_rain = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['prcp'].fillna(0).values[0]
-    precipitation_snow = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['snow'].fillna(0).values[0]
-    precipitation = precipitation_snow + precipitation_rain
-    
-    #Wdir
-    wind_direction_degrees = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['wdir'].fillna(0).values[0]
-    
-    #WPGT
-    wind_speed = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['wspd'].fillna(0).values[0]
-    
-    #Pres
-    pressure = meteo_data[meteo_data.index == today.strftime('%Y-%m-%d')]['pres'].fillna(0).values[0]
-    
-    sunlight_duration_hours = None
-
-    # Print forecast data
-    print("Forecast for today:")
-    print(f"Precipitation: {precipitation} mm")
-    print(f"Wind Direction: {wind_direction_degrees}")
-    print(f"Wind Peak Gust: {wind_speed} m/s")
-    print(f"Pressure: {pressure}")
-    print(f"Sunlight Duration: {sunlight_duration_hours} hours")
-    print(f"Average CO2: {average_co2} ppm")
-    print("Change in CO2: N/A (not available)")
-    #Previous Temps, prcp, wdir, wpgt, pres, prcp, sunlight, humidity, co2 average, co2 slope
-    #return np.array([precipitation, wind_direction_degrees, wind_speed, precipitation, , ])
-
-def generate_prediction( latitude, longitude, model):
-    get_forecast(latitude, longitude)
-    pass
+def complete_protocol():
+    save_model(complete_NN('Belvedere', prev_bel), 'Belvedere')
+    save_model(complete_NN('Midway',prev_mid), 'Midway')
+    save_model(complete_NN('Miami',prev_mia), 'Miami')
+    save_model(complete_Berg_NN("Bergstrom", prev_ber), 'Bergstrom')
 
 def main():
-    latitude = 40.7794
-    longitude = -73.9691
-    generate_prediction(latitude, longitude, None)
+    complete_protocol()
     
-main()
