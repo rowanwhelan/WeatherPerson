@@ -14,6 +14,7 @@ import pandas as pd
 def fahrenheit_to_celsius(fahrenheit):
     celsius = (fahrenheit - 32) * 5 / 9
     return celsius
+
 prev_mid = [fahrenheit_to_celsius(vals) for vals in [48,41,41]]
 prev_ber = [fahrenheit_to_celsius(vals) for vals in [79,81,72]]
 prev_mia = [fahrenheit_to_celsius(vals) for vals in [71,75,79]]
@@ -139,10 +140,10 @@ def compile_tables(name,prev_temp):
         co2_table = read_data(filename)
         co2_table = co2_table[-26295:]
         co2_table = co2_reshape(co2_table)
-        combined_array = np.column_stack((celsius_to_fahrenheit(meteo_array[:, 0]), celsius_to_fahrenheit(hist_temp[:,0]), celsius_to_fahrenheit(hist_temp[:,1]), celsius_to_fahrenheit(hist_temp[:,2]), meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array, co2_table[:, 0], co2_table[:, 1]))
+        combined_array = np.column_stack((meteo_array[:, 0], celsius_to_fahrenheit(hist_temp[:,0]), celsius_to_fahrenheit(hist_temp[:,1]), celsius_to_fahrenheit(hist_temp[:,2]), meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array, co2_table[:, 0], co2_table[:, 1]))
         return combined_array
     else:
-        combined_array = np.column_stack((celsius_to_fahrenheit(meteo_array[:, 0]), celsius_to_fahrenheit(hist_temp[:,0]), celsius_to_fahrenheit(hist_temp[:,1]), celsius_to_fahrenheit(hist_temp[:,2]), meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array))
+        combined_array = np.column_stack((meteo_array[:, 0], celsius_to_fahrenheit(hist_temp[:,0]), celsius_to_fahrenheit(hist_temp[:,1]), celsius_to_fahrenheit(hist_temp[:,2]), meteo_array[:, 1], meteo_array[:, 2], meteo_array[:, 3], meteo_array[:, 4], ncei_array[:, 1], padded_sun_array, padded_humid_array))
         return combined_array
 
 # pass in a n x 1 np array and three manually inputted temperatures get back a n x 3 np array
@@ -169,7 +170,7 @@ def NN(data,labels):
     optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
     # Training the model
-    epochs = 1000
+    epochs = 400
     batch_size = 32
     for epoch in range(epochs):
         for i in range(0, len(X), batch_size):
@@ -199,7 +200,7 @@ def Berg_NN(data,labels):
     optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
     # Training the model
-    epochs = 1000
+    epochs = 400
     batch_size = 32
     for epoch in range(epochs):
         for i in range(0, len(X), batch_size):
@@ -237,6 +238,7 @@ def test_model(model, test_data, test_labels, threshold=0.4):
     # Evaluate performance
     num_correct = 0
     for pred, true_label in zip(outputs, y_test):
+        print('predicted:', pred, 'label:', true_label)
         if torch.abs(pred - true_label) <= threshold:
             num_correct += 1
 
@@ -258,20 +260,16 @@ def complete_NN(name, prev):
     print(f'Training a model for {name}')
     data = compile_tables(name, prev)
     testing_labels, testing_data, data_labels, data = format_data(data)
-    accuracy = 0
-    while accuracy < 80:
-        model = NN(data.astype(float), data_labels.astype(float))
-        accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
+    model = NN(data.astype(float), data_labels.astype(float))
+    test_model(model,testing_data.astype(float),testing_labels.astype(float))
     return model
 
 def complete_Berg_NN(name, prev):
     print(f'Training a model for {name}')
     data = compile_tables(name, prev)
     testing_labels, testing_data, data_labels, data = format_data(data)
-    accuracy = 0
-    while accuracy < 80:
-        model = Berg_NN(data.astype(float), data_labels.astype(float))
-        accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
+    model = Berg_NN(data.astype(float), data_labels.astype(float))
+    accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
     return model
 
 def save_model(model,name):
@@ -308,10 +306,11 @@ def model_instantiation():
     save_model(ber_model,name)
 
 def complete_protocol():
-    save_model(complete_NN('Belvedere', prev_bel), 'Belvedere')
-    save_model(complete_NN('Midway',prev_mid), 'Midway')
-    save_model(complete_NN('Miami',prev_mia), 'Miami')
-    save_model(complete_Berg_NN("Bergstrom", prev_ber), 'Bergstrom')
+    #save_model(complete_NN('Belvedere', prev_bel), 'Belvedere')
+    #save_model(complete_NN('Midway',prev_mid), 'Midway')
+    #save_model(complete_NN('Miami',prev_mia), 'Miami')
+    #save_model(complete_Berg_NN("Bergstrom", prev_ber), 'Bergstrom')
+    pass
 
 def main():
     complete_protocol()

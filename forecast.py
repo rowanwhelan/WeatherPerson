@@ -1,17 +1,19 @@
-import csv
+import uuid
 from datetime import datetime, timedelta
 import numpy as np
 import requests
-import torch
+import pprint
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from keras.models import model_from_json
+from kalshi_python.models import *
 from meteostat import Point, Daily
 from keys.OpenWeather import key
 import pandas as pd
 import sys
+import kalshi_python
 sys.path.append("../")
+from CS_546.keys.kalshi import email, password
 from CS_546.data_collection.Open_Weather_Data import get_co_in_air
 from CS_546.CNN import load_model
 
@@ -95,16 +97,16 @@ def get_forecast(latitude, longitude, name):
         co2_change = co2_values[2] - co2_values[0]
     
     # Print forecast data
-    print("Forecast for today:")
-    print(f"Previous Temperatures: {prev_temp}")
-    print(f"Precipitation: {precipitation} mm")
-    print(f"Wind Direction: {wind_direction_degrees}")
-    print(f"Wind Peak Gust: {wind_speed} m/s")
-    print(f"Pressure: {pressure}")
-    print(f"Humidity: {humidity}")
-    print(f"Sunlight Duration: {sunlight_duration_hours} hours")
-    print(f"Average CO2: {co2_average} ppm")
-    print(f"Change in CO2: {co2_change}")
+    #print("Forecast for today:")
+    #print(f"Previous Temperatures: {prev_temp}")
+    #print(f"Precipitation: {precipitation} mm")
+    #print(f"Wind Direction: {wind_direction_degrees}")
+    #print(f"Wind Peak Gust: {wind_speed} m/s")
+    #print(f"Pressure: {pressure}")
+    #print(f"Humidity: {humidity}")
+    #print(f"Sunlight Duration: {sunlight_duration_hours} hours")
+    #print(f"Average CO2: {co2_average} ppm")
+    #print(f"Change in CO2: {co2_change}")
     #Previous Temps, prcp, wdir, wpgt, pres, prcp, sunlight, humidity, co2 average, co2 slope
     if name != 'Bergstrom':
         return np.array([prev_temp[0], prev_temp[1], prev_temp[2], precipitation, wind_direction_degrees, wind_speed, pressure, precipitation, sunlight_duration_hours, humidity, co2_average, co2_change ])
@@ -115,36 +117,76 @@ def generate_prediction( latitude, longitude, name, model):
     forecast = get_forecast(latitude, longitude,name)
     return model.predict(forecast)
 
+def bet_on_prediction(name, prediction):
+    config = kalshi_python.Configuration()
+    config.host = 'https://demo-api.kalshi.co/trade-api/v2'
+    kalshi_api = kalshi_python.ApiInstance(
+        email= email,
+        password= password,
+        configuration=config,
+    )
+    market_ticker = ''
+    if name == 'Midway':
+        market_ticker = ''
+    elif name == 'Bergstrom':
+        market_ticker = ''
+    elif name == 'Belvedere':
+        market_ticker = ''
+    else:
+        market_ticker = ''
+    contract_id = ''
+    exchange_status = kalshi_api.get_exchange_status()
+    print('Exchange status response: ')
+    print(exchange_status)
+    if exchange_status['trading_active']:
+        # Submit an order for 10 yes contracts at 50cents on 'FED-23DEC-T3.00'.
+        order_uuid = str(uuid.uuid4())
+        order_response = kalshi_api.create_order(CreateOrderRequest(
+            ticker=market_ticker,
+            action='buy',
+            type='limit',
+            yes_price=5000,
+            count=10,
+            client_order_id=order_uuid,
+            side='yes',
+            contract_id= contract_id
+        ))
+        print('\nOrder submitted: ')
+        pprint(order_response)
+    else:
+        print('\nThe exchange is not trading active, no orders will be sent right now.')
+
 def daily_protocol():
     #Belvedere
     latitude = 40.7794
     longitude = -73.9691
     name = 'Belvedere'
     prediction = generate_prediction(latitude, longitude, name, load_model(name))
-    print(prediction)
+    print(name, ':', prediction)
 
     #Midway
     latitude = 41.7868
     longitude = -87.7522
     name = 'Midway'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
-    print(prediction)
+    print(name, ':', prediction)
 
     #Bergstrom
     latitude = 30.1953
     longitude = -97.6667
     name = 'Bergstrom'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
-    print(prediction)
+    print(name, ':', prediction)
 
     #Miami
     latitude = 25.7951
     longitude = -80.2795
     name = 'Miami'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
-    print(prediction)
+    print(name, ':', prediction)
 
     
 def main():
-    daily_protocol()
+    bet_on_prediction('Belvedere', 52)
+
 main()
