@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 import numpy as np
 import requests
-import pprint
+from pprint import pprint
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
@@ -126,30 +126,45 @@ def bet_on_prediction(name, prediction):
         configuration=config,
     )
     market_ticker = ''
+    side = ''
     if name == 'Midway':
-        market_ticker = ''
+        market_ticker = 'HIGHCHI-24MAR31-T43'
+        if prediction < 43:
+            side = 'yes'
+        else:
+            side = 'no'
     elif name == 'Bergstrom':
-        market_ticker = ''
+        market_ticker = 'HIGHAUS-24MAR31-T79'
+        if prediction >= 79:
+            side = 'no'
+        else:
+            side = 'yes'
     elif name == 'Belvedere':
-        market_ticker = ''
+        market_ticker = 'HIGHNY-24MAR31-B57.5'
+        if prediction < 57 or prediction > 58:
+            side = 'no'
+        else:
+            side = 'yes'
     else:
-        market_ticker = ''
-    contract_id = ''
+        market_ticker = 'HIGHMIA-24MAR31-T75'
+        if prediction >= 75:
+            side = 'no'
+        else:
+            side = 'yes'
     exchange_status = kalshi_api.get_exchange_status()
     print('Exchange status response: ')
     print(exchange_status)
-    if exchange_status['trading_active']:
+    if exchange_status.trading_active:
         # Submit an order for 10 yes contracts at 50cents on 'FED-23DEC-T3.00'.
         order_uuid = str(uuid.uuid4())
         order_response = kalshi_api.create_order(CreateOrderRequest(
             ticker=market_ticker,
             action='buy',
             type='limit',
-            yes_price=5000,
-            count=10,
+            yes_price=50,
+            count=500,
             client_order_id=order_uuid,
-            side='yes',
-            contract_id= contract_id
+            side=side,
         ))
         print('\nOrder submitted: ')
         pprint(order_response)
@@ -162,31 +177,31 @@ def daily_protocol():
     longitude = -73.9691
     name = 'Belvedere'
     prediction = generate_prediction(latitude, longitude, name, load_model(name))
-    print(name, ':', prediction)
-
+    print('prediction',prediction)
+    bet_on_prediction(name, prediction)
     #Midway
     latitude = 41.7868
     longitude = -87.7522
     name = 'Midway'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
-    print(name, ':', prediction)
-
+    print('prediction',prediction)
+    bet_on_prediction(name, prediction)
     #Bergstrom
     latitude = 30.1953
     longitude = -97.6667
     name = 'Bergstrom'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
-    print(name, ':', prediction)
-
+    print('prediction',prediction)
+    bet_on_prediction(name, prediction)
     #Miami
     latitude = 25.7951
     longitude = -80.2795
     name = 'Miami'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
-    print(name, ':', prediction)
-
+    print('prediction',prediction)
+    bet_on_prediction(name, prediction)
     
 def main():
-    bet_on_prediction('Belvedere', 52)
+    daily_protocol()
 
 main()
