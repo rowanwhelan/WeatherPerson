@@ -128,26 +128,26 @@ def bet_on_prediction(name, prediction):
     market_ticker = ''
     side = ''
     if name == 'Midway':
-        market_ticker = 'HIGHCHI-24MAR31-T43'
-        if prediction < 43:
+        market_ticker = 'HIGHCHI-24APR01-T42'
+        if prediction < 42:
             side = 'yes'
         else:
             side = 'no'
     elif name == 'Bergstrom':
-        market_ticker = 'HIGHAUS-24MAR31-T79'
-        if prediction >= 79:
+        market_ticker = 'HIGHAUS-24APR01-T83'
+        if prediction >= 83:
             side = 'no'
         else:
             side = 'yes'
     elif name == 'Belvedere':
-        market_ticker = 'HIGHNY-24MAR31-B57.5'
-        if prediction < 57 or prediction > 58:
+        market_ticker = 'HIGHNY-24APR01-T48'
+        if prediction >= 48:
             side = 'no'
         else:
             side = 'yes'
     else:
-        market_ticker = 'HIGHMIA-24MAR31-T75'
-        if prediction >= 75:
+        market_ticker = 'HIGHMIA-24APR01-T76'
+        if prediction >= 76:
             side = 'no'
         else:
             side = 'yes'

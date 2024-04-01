@@ -118,7 +118,7 @@ Day 2:
 Day 3:
         Funds: 4873
         Trades: Belvedere: NO, Midway: NO, Austin: NO, Miami: NO
-        Net Change:
+        Net Change: 269
                
         Order submitted: 
         {'order': {'action': 'buy',
@@ -172,5 +172,60 @@ Day 3:
                 'type': 'limit',
                 'user_id': '54db17e3-a7b6-468b-9421-4649266ca655',
                 'yes_price': 50}}
+Day 4:
+        Funds:5142
+        Trades: Belvedere: YES, Midway: NO, Austin: NO, Miami: NO
+        Net Change: 
 
-
+        Order submitted: 
+        {'order': {'action': 'buy',
+                'client_order_id': 'dbf8548c-bbb1-4b0b-8232-ed55f73c1a13',
+                'created_time': '2024-04-01T16:34:02.133711Z',
+                'expiration_time': None,
+                'no_price': 50,
+                'order_id': 'efcbea01-21b8-4d0b-857b-af1da8dc1b42',       
+                'side': 'yes',
+                'status': 'resting',
+                'ticker': 'HIGHNY-24APR01-T48',
+                'type': 'limit',
+                'user_id': '54db17e3-a7b6-468b-9421-4649266ca655',        
+                'yes_price': 50}}
+        Order submitted:
+        {'order': {'action': 'buy',
+                'client_order_id': '54002abf-f1b5-4639-9e42-49cc5cc91105',      
+                'created_time': '2024-04-01T16:34:04.501817Z',
+                'expiration_time': None,
+                'no_price': 50,
+                'order_id': 'f484cdc9-f321-4cbd-9a82-35e3e41adf33',
+                'side': 'no',
+                'status': 'resting',
+                'ticker': 'HIGHCHI-24APR01-T42',
+                'type': 'limit',
+                'user_id': '54db17e3-a7b6-468b-9421-4649266ca655',
+                'yes_price': 50}}
+        Order submitted:
+        {'order': {'action': 'buy',
+                'client_order_id': '1c2ee3ea-f23f-4477-b56e-e44170176ba3',      
+                'created_time': '2024-04-01T16:34:06.377227Z',
+                'expiration_time': None,
+                'no_price': 50,
+                'order_id': '818504d5-c97d-4963-8ff3-b8b7e98ed0b0',
+                'side': 'no',
+                'status': 'resting',
+                'ticker': 'HIGHAUS-24APR01-T83',
+                'type': 'limit',
+                'user_id': '54db17e3-a7b6-468b-9421-4649266ca655',
+                'yes_price': 50}}
+        Order submitted:
+        {'order': {'action': 'buy',
+                'client_order_id': '16bf9466-4ec7-4053-b8f7-c6486a7af068',      
+                'created_time': '2024-04-01T16:34:08.541811Z',
+                'expiration_time': None,
+                'no_price': 50,
+                'order_id': '1e0e69f9-3341-47c7-9340-3fd25d004cd9',
+                'side': 'no',
+                'status': 'resting',
+                'ticker': 'HIGHMIA-24APR01-T76',
+                'type': 'limit',
+                'user_id': '54db17e3-a7b6-468b-9421-4649266ca655',
+                'yes_price': 50}}
