@@ -269,7 +269,7 @@ def complete_Berg_NN(name, prev):
     data = compile_tables(name, prev)
     testing_labels, testing_data, data_labels, data = format_data(data)
     model = Berg_NN(data.astype(float), data_labels.astype(float))
-    accuracy = test_model(model,testing_data.astype(float),testing_labels.astype(float))
+    test_model(model,testing_data.astype(float),testing_labels.astype(float))
     return model
 
 def save_model(model,name):
@@ -306,11 +306,11 @@ def model_instantiation():
     save_model(ber_model,name)
 
 def complete_protocol():
-    #save_model(complete_NN('Belvedere', prev_bel), 'Belvedere')
-    #save_model(complete_NN('Midway',prev_mid), 'Midway')
-    #save_model(complete_NN('Miami',prev_mia), 'Miami')
-    #save_model(complete_Berg_NN("Bergstrom", prev_ber), 'Bergstrom')
-    pass
+    save_model(complete_NN('Belvedere', prev_bel), 'Belvedere')
+    save_model(complete_NN('Midway',prev_mid), 'Midway')
+    save_model(complete_NN('Miami',prev_mia), 'Miami')
+    save_model(complete_Berg_NN("Bergstrom", prev_ber), 'Bergstrom')
+    
 
 def main():
     complete_protocol()
