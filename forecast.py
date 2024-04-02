@@ -128,26 +128,26 @@ def bet_on_prediction(name, prediction):
     market_ticker = ''
     side = ''
     if name == 'Midway':
-        market_ticker = 'HIGHCHI-24APR01-T42'
-        if prediction < 42:
+        market_ticker = 'HIGHCHI-24APR02-T38'
+        if prediction < 38:
             side = 'yes'
         else:
             side = 'no'
     elif name == 'Bergstrom':
-        market_ticker = 'HIGHAUS-24APR01-T83'
-        if prediction >= 83:
+        market_ticker = 'HIGHAUS-24APR02-T75'
+        if prediction > 75:
             side = 'no'
         else:
             side = 'yes'
     elif name == 'Belvedere':
-        market_ticker = 'HIGHNY-24APR01-T48'
-        if prediction >= 48:
-            side = 'no'
-        else:
+        market_ticker = 'HIGHNY-24APR02-B47.5'
+        if prediction < 48 and prediction > 47:
             side = 'yes'
+        else:
+            side = 'no'
     else:
-        market_ticker = 'HIGHMIA-24APR01-T76'
-        if prediction >= 76:
+        market_ticker = 'HIGHMIA-24APR02-T79'
+        if prediction > 79:
             side = 'no'
         else:
             side = 'yes'
@@ -178,14 +178,14 @@ def daily_protocol():
     name = 'Belvedere'
     prediction = generate_prediction(latitude, longitude, name, load_model(name))
     print('prediction',prediction)
-    bet_on_prediction(name, prediction)
+    #bet_on_prediction(name, prediction)
     #Midway
     latitude = 41.7868
     longitude = -87.7522
     name = 'Midway'
     prediction = generate_prediction(latitude,longitude, name, load_model(name) )
     print('prediction',prediction)
-    bet_on_prediction(name, prediction)
+    #bet_on_prediction(name, prediction)
     #Bergstrom
     latitude = 30.1953
     longitude = -97.6667
